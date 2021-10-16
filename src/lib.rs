@@ -61,17 +61,7 @@ fn ulimited_memory() -> Result<Option<u64>> {
         rlim_cur: 0,
         rlim_max: 0,
     };
-    // https://github.com/rust-lang/libc/pull/1919
-    cfg_if!(
-    if #[cfg( target_os="netbsd")] {
-    // https://github.com/NetBSD/src/blob/f869ef2144970023b53d335d9a23ecf100d4b973/sys/sys/resource.h#L98
-    let rlimit_as = 10;
-        }
-    else {
-    let rlimit_as = libc::RLIMIT_AS;
-    }
-    );
-    match unsafe { libc::getrlimit(rlimit_as, &mut out as *mut libc::rlimit) } {
+    match unsafe { libc::getrlimit(libc::RLIMIT_AS, &mut out as *mut libc::rlimit) } {
         0 => Ok(()),
         _ => Err(std::io::Error::last_os_error()),
     }?;
